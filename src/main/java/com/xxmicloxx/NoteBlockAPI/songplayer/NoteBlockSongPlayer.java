@@ -7,14 +7,19 @@ import com.xxmicloxx.NoteBlockAPI.model.*;
 import com.xxmicloxx.NoteBlockAPI.utils.CompatibilityUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+
+import java.util.Random;
 
 /**
  * SongPlayer created at a specified NoteBlock
  *
  */
 public class NoteBlockSongPlayer extends RangeSongPlayer {
+
+	private static Random ran = new Random();
 
 	private Block noteBlock;
 
@@ -41,11 +46,11 @@ public class NoteBlockSongPlayer extends RangeSongPlayer {
 	private NoteBlockSongPlayer(SongPlayer songPlayer) {
 		super(songPlayer);
 	}
-	
+
 	@Override
 	void update(String key, Object value) {
 		super.update(key, value);
-		
+
 		switch (key){
 			case "noteBlock":
 				noteBlock = (Block) value;
@@ -81,7 +86,7 @@ public class NoteBlockSongPlayer extends RangeSongPlayer {
 		byte playerVolume = NoteBlockAPI.getPlayerVolume(player);
 		Location loc = noteBlock.getLocation();
 		loc = new Location(loc.getWorld(), loc.getX() + 0.5f, loc.getY() - 0.5f, loc.getZ() + 0.5f);
-		
+
 		for (Layer layer : song.getLayerHashMap().values()) {
 			Note note = layer.getNote(tick);
 			if (note == null) {
@@ -91,7 +96,10 @@ public class NoteBlockSongPlayer extends RangeSongPlayer {
 			float volume = ((layer.getVolume() * (int) this.volume * (int) playerVolume * note.getVelocity()) / 100_00_00_00F)
 					* ((1F / 16F) * getDistance());
 
-            channelMode.play(player, loc, song, layer, note, soundCategory, volume, !enable10Octave);
+			channelMode.play(player, loc, song, layer, note, soundCategory, volume, !enable10Octave);
+			Location nbloc = noteBlock.getLocation();
+			nbloc.add(0.5, 1.5, 0.5);
+			noteBlock.getWorld().spawnParticle(Particle.NOTE, nbloc, 1, ran.nextInt(24) / 24, 0.5, 0.1, 1, null);
 
 			if (isInRange(player)) {
 				if (!this.playerList.get(player.getUniqueId())) {
@@ -106,12 +114,12 @@ public class NoteBlockSongPlayer extends RangeSongPlayer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns true if the Player is able to hear the current NoteBlockSongPlayer 
 	 * @param player in range
 	 * @return ability to hear the current NoteBlockSongPlayer
-	 */	
+	 */
 	@Override
 	public boolean isInRange(Player player) {
 		Location loc = noteBlock.getLocation();

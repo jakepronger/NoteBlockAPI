@@ -17,5 +17,5 @@
 	<dependency>
 	    <groupId>com.github.jakepronger</groupId>
 	    <artifactId>NoteBlockAPI</artifactId>
-	    <version>Tag</version>
+	    <version>1.0</version>
 	</dependency>
